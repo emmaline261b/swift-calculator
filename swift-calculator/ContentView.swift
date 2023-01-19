@@ -49,7 +49,7 @@ struct ContentView: View {
                 HStack {
                     CalcButton(buttonText: "0", buttonWidth: 148, action: didPressNumber)
                     CalcButton(buttonText: "C", buttonColor: Color(hue: 1.0, saturation: 0.0, brightness: 0.716), action: didPressClear(button:))
-                    CalcButton(buttonText: "=", buttonColor: .orange, action: didPressEnter(button:))
+                    CalcButton(buttonText: "=", buttonColor: .orange, action: didPressEquals(button:))
                 }
                 
             }
@@ -74,11 +74,20 @@ struct ContentView: View {
     }
     
     func didPressMode(button : CalcButton) {
+        
         currentMode = button.mode
         lastButtonWasMode = true
     }
     
-    func didPressEnter(button : CalcButton) {
+    func didPressClear(button : CalcButton) {
+        currentValue = "0"
+        currentMode = .notSet
+        lastButtonWasMode = false
+        savedNum = 0
+        currentValueInt = 0
+    }
+    
+    func didPressEquals(button : CalcButton) {
         if (currentMode == .notSet || lastButtonWasMode) {
             return
         }
@@ -94,10 +103,6 @@ struct ContentView: View {
         currentValueInt = savedNum
         updateText()
         lastButtonWasMode = true
-    }
-    
-    func didPressClear(button : CalcButton) {
-        currentValue = "0"
     }
     
     func updateText() {
