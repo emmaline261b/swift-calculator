@@ -19,6 +19,8 @@ struct ContentView: View {
     @State var currentValue = "0"
     @State var currentMode : CalculatorMode = .notSet
     @State var lastButtonWasMode : Bool = false
+    @State var savedNum : Int = 0
+    @State var currentValueInt : Int = 0
     
     var body: some View {
         
@@ -56,16 +58,19 @@ struct ContentView: View {
     }
     
     func didPressNumber(button : CalcButton) {
-        if let parsedValue = Int(currentValue + button.buttonText) {
-            currentValue = "\(parsedValue)"
-        } else {
-            currentValue = "error"
-        }
-        
         if lastButtonWasMode {
             lastButtonWasMode = false
+            currentValueInt = 0
         }
         
+        if let parsedValue = Int("\(currentValueInt)" + button.buttonText) {
+            currentValueInt = parsedValue
+            updateText()
+        } else {
+            currentValue = "error"
+            currentValueInt = 0
+        }
+                
     }
     
     func didPressMode(button : CalcButton) {
@@ -77,12 +82,35 @@ struct ContentView: View {
         if (currentMode == .notSet || lastButtonWasMode) {
             return
         }
+        
+        if (currentMode == .addition) {
+            savedNum += currentValueInt
+        } else if (currentMode == .subtraction) {
+            savedNum -= currentValueInt
+        } else if (currentMode == .multiplication) {
+            savedNum *= currentValueInt
+        }
+
+        currentValueInt = savedNum
+        updateText()
+        lastButtonWasMode = true
     }
     
     func didPressClear(button : CalcButton) {
         currentValue = "0"
     }
     
+    func updateText() {
+        if (currentMode == .notSet) {
+            savedNum = currentValueInt
+        }
+        
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        let num = NSNumber(value: currentValueInt)
+        
+        currentValue = formatter.string(from: num) ?? "Error"
+    }
     
 }
 
